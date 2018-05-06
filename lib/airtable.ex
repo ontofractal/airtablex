@@ -1,52 +1,29 @@
 defmodule Airtable do
-  use HTTPoison.Base
+  use Tesla
+  @api_key Application.get_env(:airtable, :api_key)
+  @base Application.get_env(:airtable, :base)
 
-  def fetch_records(table_name) do
-     records = build_url(table_name)
-       |> Airtable.get
-       |> handle_response
-       |> Poison.decode!
-       |> Map.get("records")
-       |> Enum.map(&Airtable.Record.new/1)
-     {:ok, records}
+  plug(Tesla.Middleware.BaseUrl, "https://api.airtable.com/v0/#{@base}/")
+  plug(Tesla.Middleware.Headers, [{"Authorization", "Bearer " <> @api_key}])
+  plug(Tesla.Middleware.JSON)
+
+  def new() do
+    Tesla.build_client([])
   end
 
-  def fetch_record(table_name, id: id) do
-    record = build_url(table_name) <>  "/" <> id
-      |> Airtable.get
-      |> handle_response
-      |> Poison.decode!
-    {:ok, record}
+  def fetch_records(table, opts \\ %{}) do
+    offset = opts[:offset]
+
+    case get!(new(), table, query: [offset: offset]) do
+      %{status: 200, body: %{"records" => records, "offset" => offset}} ->
+        {:ok, next_offset_records} = fetch_records(table, %{offset: offset})
+        {:ok, records ++ next_offset_records}
+
+      %{status: 200, body: %{"records" => records}} ->
+        {:ok, records}
+
+      env ->
+        {:error, env}
+    end
   end
-
-
-  def build_url(table) do
-    base = Application.get_env(:airtable, :base)
-    "https://api.airtable.com/v0/#{base}/#{table}"
-  end
-
-
-  defp process_request_headers(headers) do
-    api_key = Application.get_env(:airtable, :api_key)
-    Enum.into(headers, [{"Authorization", "Bearer " <> api_key}])
-  end
-
-  defp handle_response(response) do
-    case response do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        body
-      {:ok, %HTTPoison.Response{status_code: status_code}} ->
-        raise "Airtable error: status code #{status_code}"
-      {:error, %HTTPoison.Error{reason: reason}} ->
-        raise "HTTP error: " <> reason
-      end
-  end
-
-
-end
-
-defmodule Airtable.Record do
-  defstruct [id: "", fields: %{}, created_time: ""]
-
-  use ExConstructor
 end

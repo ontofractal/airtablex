@@ -3,11 +3,11 @@ defmodule Airtable.Mixfile do
 
   def project do
     [app: :airtable,
-     version: "0.0.1",
-     elixir: "~> 1.2",
+     version: "0.1.0",
+     elixir: "~> 1.6",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps]
+     deps: deps()]
   end
 
   # Configuration for the OTP application
@@ -34,7 +34,9 @@ defmodule Airtable.Mixfile do
       {:mix_test_watch, ">= 0.0.0", only: [:dev, :test]},
       {:power_assert, ">= 0.0.0"},
       {:exconstructor, ">= 1.0.0"},
-      {:poison, "~> 2.2"}
+      {:poison, "~> 2.2"},
+      {:tesla, "~> 1.0.0-beta"},
+      {:jason, "~> 1.0.0"},
     ]
   end
 end
