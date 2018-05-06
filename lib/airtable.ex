@@ -5,7 +5,7 @@ defmodule Airtable do
   @base Application.get_env(:airtable, :base)
 
   plug(Tesla.Middleware.BaseUrl, "https://api.airtable.com/v0/#{@base}/")
-  plug(Tesla.Middleware.Headers, [{"Authorization", "Bearer " <> @api_key}])
+  plug(Tesla.Middleware.Headers, [{"Authorization", "Bearer #{@api_key}"}])
   plug(Tesla.Middleware.JSON)
 
   def new() do
