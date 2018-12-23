@@ -28,15 +28,15 @@ defmodule Airtable.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:httpoison, "~> 0.8"},
-      {:credo, "~> 0.2", only: [:test,:dev]},
+      {:httpoison, "~> 1.0"},
+      {:credo, "~> 1.0", only: [:test,:dev]},
       {:coverex, "~> 1.4", only: :test},
       {:mix_test_watch, ">= 0.0.0", only: [:dev, :test]},
       {:power_assert, ">= 0.0.0"},
       {:exconstructor, ">= 1.0.0"},
-      {:poison, "~> 2.2"},
-      {:tesla, "~> 1.0.0-beta"},
-      {:jason, "~> 1.0.0"},
+      {:poison, "~> 4.0"},
+      {:tesla, "~> 1.0"},
+      {:jason, "~> 1.0"},
     ]
   end
 end
